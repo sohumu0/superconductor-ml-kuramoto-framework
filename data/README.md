@@ -21,6 +21,6 @@ Place the following file in `3dsc_data/`:
 
 If starting from the raw 3DSC dataset, first obtain `3DSC_MP.csv` from the source below, then run `python ml/generate_magpie_features.py` to generate MAGPIE features.
 
-Source: [3DSC dataset on figshare](https://doi.org/10.6084/m9.figshare.22266958)
+Source: [3DSC GitHub Repository](https://github.com/aimat-lab/3DSC)
 
 Reference: Sommer, T., Willa, R., Schmalian, J., & Friederich, P. (2023). 3DSC — a dataset of superconductors including crystal structures. *Scientific Data*, 10(1), 816.
