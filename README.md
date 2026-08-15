@@ -35,9 +35,15 @@ superconductor-ml-kuramoto-framework/
 ## Setup
 
 ```bash
-git clone <repo-url>
+git clone https://github.com/sohumu0/superconductor-ml-kuramoto-framework.git
 cd superconductor-ml-kuramoto-framework
-python -m venv venv && source venv/bin/activate
+
+# For macOS and Linux:
+python3 -m venv venv && source venv/bin/activate
+
+# For Windows:
+# python -m venv venv && .\venv\Scripts\activate
+
 pip install -r requirements.txt
 ```
 
