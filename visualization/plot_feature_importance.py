@@ -12,7 +12,7 @@ from PIL import Image, ImageDraw, ImageFont
 
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-IMPORTANCE_PATH = PROJECT_ROOT / "analysis_results" / "figure3_xgboost_feature_importance.csv"
+IMPORTANCE_PATH = PROJECT_ROOT / "analysis_results" / "xgboost_feature_importance_3dsc.csv"
 FIGURE_DIR = PROJECT_ROOT / "figures"
 
 CANVAS_W = 1900
@@ -101,6 +101,13 @@ def load_importances():
     for row in rows:
         row["importance_mean"] = float(row["importance_mean"])
         row["importance_std"] = float(row["importance_std"])
+        
+        # Inject the missing columns so the script doesn't crash
+        if "dataset" not in row:
+            row["dataset"] = "3DSC"
+        if "feature_space" not in row:
+            row["feature_space"] = "Structural + MAGPIE"
+            
     return rows
 
 
@@ -140,6 +147,10 @@ def draw_panel(draw, box, panel_label, title, rows):
     text(draw, (x0, y0), f"{panel_label} {title}", title_font)
 
     top_rows = sorted(rows, key=lambda r: r["importance_mean"], reverse=True)[:8]
+    
+    if not top_rows:
+        return
+        
     max_percent = max(r["importance_mean"] for r in top_rows) * 100
     axis_max = rounded_axis_max(max_percent)
 
