@@ -6,7 +6,7 @@ uniformity score S_comp from five formula-derived disorder descriptors,
 then runs Kuramoto simulations parameterized by Tc and S_comp to
 produce order-parameter and vortex-defect predictions.
 
-Generates Figure 6 (dataset-Kuramoto bridge matrix).
+Generates Figure 3 (dataset-Kuramoto bridge matrix).
 """
 from pathlib import Path
 import math
