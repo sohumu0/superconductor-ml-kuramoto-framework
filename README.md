@@ -9,7 +9,7 @@ Code and analysis for a two-stage superconductor screening framework that combin
 ## Repository Structure
 
 ```
-superconductor-screening/
+superconductor-ml-kuramoto-framework/
 ├── simulation/
 │   ├── generate_bkt_lattice_figures.py   # BKT transition, lattice geometry, composition figures
 │   └── dataset_kuramoto_bridge.py        # Composition-score to Kuramoto bridge (Figure 6)
@@ -36,7 +36,7 @@ superconductor-screening/
 
 ```bash
 git clone <repo-url>
-cd superconductor-screening
+cd superconductor-ml-kuramoto-framework
 python -m venv venv && source venv/bin/activate
 pip install -r requirements.txt
 ```
