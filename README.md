@@ -1,33 +1,41 @@
-# Superconductor Screening via Materials Informatics and Phase-Dynamics Simulation
+# Superconductor Phase-Coherence Screening via RCSJ-Kuramoto Simulation
 
-Code and analysis for a two-stage superconductor screening framework that combines machine learning critical-temperature prediction with RCSJ-derived Kuramoto phase-coherence simulation.
+Code repository for reproducing all simulation results, figures, and statistical analyses in:
 
-**Stage 1 (Materials Informatics):** XGBoost, SVR, and MLP models trained on the 3DSC dataset (5,773 samples, 159 structural + MAGPIE features) with GroupShuffleSplit cross-validation to prevent data leakage from compositional redundancy. Benchmarked against the UCI/SuperCon dataset to quantify the feature-intrinsic predictive ceiling (R-squared ~ 0.50 on 3DSC vs. > 0.90 on UCI).
+> S. Uttamchandani and K. Walker, "Phase Coherence and Vortex Dynamics in Superconducting Grain Networks: An RCSJ-Kuramoto Simulation," *Journal of High School Science*, 2026. (Submitted)
 
-**Stage 2 (Phase-Dynamics Simulation):** Kuramoto phase-oscillator equations derived from the RCSJ circuit model under the overdamped approximation (Stewart-McCumber parameter beta_c < 1). Stochastic simulations on 2D lattices with honeycomb, square, and triangular coordination probe the Berezinskii-Kosterlitz-Thouless (BKT) vortex-unbinding crossover and the effect of lattice geometry and coupling disorder on phase coherence.
+## Overview
+
+This project uses stochastic Kuramoto phase-oscillator simulations derived from the Resistively and Capacitively Shunted Junction (RCSJ) circuit model to study phase coherence in two-dimensional models of superconducting grain networks. The simulations probe:
+
+1. **Noise-driven coherence-to-disorder crossover** consistent with BKT vortex unbinding
+2. **Coordination number and coupling disorder effects** on vortex suppression
+3. **Composition-score bridge** connecting chemical uniformity to simulated phase coherence at 77 K
 
 ## Repository Structure
 
 ```
 superconductor-ml-kuramoto-framework/
 ├── simulation/
-│   ├── generate_bkt_lattice_figures.py   # BKT transition, lattice geometry, composition figures
-│   └── dataset_kuramoto_bridge.py        # Composition-score to Kuramoto bridge (Figure 6)
+│   ├── run_enhanced_simulations.py      # JHSS paper: noise sweep, finite-size scaling,
+│   │                                    #   time-series, Tables 1-2, Kruskal-Wallis, sensitivity
+│   ├── generate_bkt_lattice_figures.py  # BKT phase transition, lattice geometry, composition
+│   └── dataset_kuramoto_bridge.py       # Composition-score bridge using real datasets
 ├── ml/
-│   ├── train_xgboost_3dsc.py             # XGBoost on 3DSC with GroupShuffleSplit
-│   ├── train_svr_3dsc.py                 # SVR on 3DSC with GroupShuffleSplit
-│   ├── train_nn_3dsc.py                  # MLP on 3DSC with GroupShuffleSplit
-│   ├── train_xgboost_uci.py             # XGBoost on UCI/SuperCon (baseline)
-│   └── generate_magpie_features.py       # MAGPIE feature generation via matminer
+│   ├── train_xgboost_3dsc.py            # XGBoost on 3DSC with GroupShuffleSplit
+│   ├── train_svr_3dsc.py               # SVR on 3DSC with GroupShuffleSplit
+│   ├── train_nn_3dsc.py                # MLP on 3DSC with GroupShuffleSplit
+│   ├── train_xgboost_uci.py            # XGBoost on UCI/SuperCon (baseline)
+│   └── generate_magpie_features.py      # MAGPIE feature generation via matminer
 ├── visualization/
-│   ├── plot_ml_performance.py            # Figure 2: ML performance comparison
-│   └── plot_feature_importance.py        # Figure 3: XGBoost feature importance
+│   ├── plot_ml_performance.py           # ML performance comparison
+│   └── plot_feature_importance.py       # XGBoost feature importance
 ├── data/
-│   ├── README.md                         # Dataset download instructions
-│   ├── hamideih_data/                    # UCI/SuperCon data (user-provided)
-│   └── 3dsc_data/                        # 3DSC data (user-provided)
-├── figures/                              # Generated figure output
-├── analysis_results/                     # Generated analysis CSV output
+│   ├── README.md                        # Dataset download instructions
+│   ├── hamideih_data/                   # UCI/SuperCon data (user-provided)
+│   └── 3dsc_data/                       # 3DSC data (user-provided)
+├── figures/                             # Generated figure output
+├── analysis_results/                    # Generated analysis output (JSON, CSV)
 ├── requirements.txt
 └── README.md
 ```
@@ -60,51 +68,65 @@ python ml/generate_magpie_features.py
 
 ## Reproducing Results
 
-### ML benchmarking (Stage 1)
+### Figures 1, 5, 6: BKT transition, lattice geometry, composition heatmaps
 
-Train all three models on 3DSC with grouped cross-validation:
-```bash
-python ml/train_xgboost_3dsc.py
-python ml/train_svr_3dsc.py
-python ml/train_nn_3dsc.py
-```
-
-UCI/SuperCon baseline (demonstrates inflated R-squared from compositional redundancy):
-```bash
-python ml/train_xgboost_uci.py
-```
-
-### Phase-dynamics simulation (Stage 2)
-
-Generate BKT transition, lattice geometry, and composition figures:
 ```bash
 python simulation/generate_bkt_lattice_figures.py
 ```
 
-Run the dataset-Kuramoto bridge analysis (requires both datasets):
+Generates `fig_bkt.png` (Figure 1), `fig_lattice.png` (Figure 5), and `fig_composition.png` (Figure 6) in `figures/`.
+
+### Figures 2-4, Tables 1-2, statistical tests
+
+```bash
+python simulation/run_enhanced_simulations.py
+```
+
+This single script runs all quantitative analyses reported in the paper:
+
+| Output | Paper element | Description |
+|--------|---------------|-------------|
+| `fig_noise_sweep.png` | Figure 2 | Dense 10-point noise sweep, 3 geometries, 10 seeds |
+| `fig_timeseries.png` | Figure 3 | Time-series convergence over 5,000 steps |
+| `fig_finite_size.png` | Figure 4 | Finite-size scaling, L = 16 to 128, 8 seeds |
+| `simulation_results.json` | Tables 1-2 | All numerical values with standard deviations |
+| (console output) | Section 4.4 | Kruskal-Wallis H = 3.85, p = 0.15; ANOVA F = 2.83, p = 0.07 |
+| (console output) | Section 4.4 | Sensitivity analysis on S_comp mapping slope (+/-30%) |
+
+### Dataset-Kuramoto bridge (requires datasets)
+
 ```bash
 python simulation/dataset_kuramoto_bridge.py
 ```
 
-### Visualization
+### ML benchmarking
 
-Generate publication figures (requires analysis_results/ from ML training):
 ```bash
-python visualization/plot_ml_performance.py
-python visualization/plot_feature_importance.py
+python ml/train_xgboost_3dsc.py
+python ml/train_svr_3dsc.py
+python ml/train_nn_3dsc.py
+python ml/train_xgboost_uci.py
 ```
 
-## Key Parameters
+## Key Simulation Parameters
 
 | Parameter | Value | Description |
 |-----------|-------|-------------|
-| K (coupling) | 0.01 per bond | Places BKT crossover within accessible noise range |
+| K_0 (coupling) | 0.01 | Places BKT crossover near T~ ~ 1 |
 | beta_c | < 1 | Overdamped RCSJ regime |
-| Lattice size | 32 x 32 (BKT, composition), 24 x 24 (lattice) | Square grid |
-| Noise range | T_tilde = [0.05, 1.00, 2.00] | Dimensionless thermal noise |
-| GroupShuffleSplit | 10 splits, 80/20 | Prevents compositional data leakage |
+| dt | 0.02 | Euler-Maruyama time step |
+| Steps | 5,000 | Integration steps per simulation |
+| Lattice sizes | 16-128 (scaling), 24 (geometry), 32 (composition) | Square grid side length |
+| Noise range | T~ = 0.1 to 2.0 | Dimensionless thermal noise |
 | Operating temperature | 77 K | Liquid nitrogen (composition analysis) |
+| Seeds | 8-20 per condition | Deterministic for reproducibility |
 
+## Runtime Estimates
+
+- `generate_bkt_lattice_figures.py`: ~2 minutes
+- `run_enhanced_simulations.py`: ~15-30 minutes (128x128 finite-size scaling dominates)
+- `dataset_kuramoto_bridge.py`: ~1 minute (requires datasets)
+  
 ## License
 
 This project is released for academic and research purposes.
